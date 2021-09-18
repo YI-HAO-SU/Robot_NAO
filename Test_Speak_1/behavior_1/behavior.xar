@@ -1,0 +1,1314 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.ald.softbankrobotics.com/schema/choregraphe/project.xsd" xar_version="3">
+  <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0">
+    <bitmap>media/images/box/root.png</bitmap>
+    <script language="4">
+      <content>
+        <![CDATA[]]>
+      </content>
+    </script>
+    <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+    <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+    <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+    <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+    <Timeline enable="0">
+      <BehaviorLayer name="behavior_layer1">
+        <BehaviorKeyframe name="keyframe1" index="1">
+          <Diagram>
+            <Box name="NAO Say Box" id="1" localization="8" tooltip="speak Hallo" x="428" y="30">
+              <bitmap>media/images/box/box-dialog.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        #self.onStopped() #activate the output of the box
+        from naoqi import ALProxy
+
+
+        ttsProxy = ALProxy("ALTextToSpeech")
+        ttsProxy.say("Hello,i am a Robot AAAAAAAAAAAAAAAA!")
+
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+            </Box>
+            <Box name="Sit Down" id="3" localization="8" tooltip="the robot tries to sit down from any position for a number of tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." x="800" y="369">
+              <bitmap>media/images/box/movement/sit_ground.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="success" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated when the robot succeed in sitting down." id="4" />
+              <Output name="failure" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the robot failed to sit down after n tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." id="5" />
+              <Timeline enable="0">
+                <BehaviorLayer name="SitDownBehavior">
+                  <BehaviorKeyframe name="DetectRobotPose" index="1">
+                    <Diagram>
+                      <Box name="Goto Posture" id="7" localization="8" tooltip="The robot goes from its current postition to the asked posture." x="371" y="101">
+                        <bitmap>media/images/box/box-diagram.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.postureService = self.session().service("ALRobotPosture")
+        pass
+
+    def onUnload(self):
+        self.postureService.stopMove()
+
+    def onInput_onStart(self):
+        result = self.postureService.goToPosture(self.getParameter("Name"), self.getParameter("Speed (%)")/100.)
+        if(result):
+            self.success()
+        else:
+            self.failure()
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #~ it is recommanded to call onUnload of this box in a onStop method, as the code written in onUnload is used to stop the box as well
+        pass]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                        <Output name="success" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated if the posture has been reached." id="4" />
+                        <Output name="failure" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated if the posture could not be reached." id="5" />
+                        <Parameter name="Name" inherits_from_parent="0" content_type="3" value="Sit" default_value="Sit" custom_choice="1" tooltip="Name of the posture to go to." id="6">
+                          <Choice value="Crouch" />
+                          <Choice value="LyingBack" />
+                          <Choice value="LyingBelly" />
+                          <Choice value="Sit" />
+                          <Choice value="SitRelax" />
+                          <Choice value="StandInit" />
+                          <Choice value="Stand" />
+                          <Choice value="StandZero" />
+                        </Parameter>
+                        <Parameter name="Speed (%)" inherits_from_parent="0" content_type="1" value="80" default_value="100" min="0" max="100" tooltip="Speed to go to the posture." id="7" />
+                        <Resource name="All motors" type="Lock" timeout="0" />
+                        <Resource name="Stiffness" type="Lock" timeout="0" />
+                      </Box>
+                      <Link inputowner="7" indexofinput="2" outputowner="0" indexofoutput="2" />
+                      <Link inputowner="0" indexofinput="4" outputowner="7" indexofoutput="4" />
+                      <Link inputowner="0" indexofinput="5" outputowner="7" indexofoutput="5" />
+                    </Diagram>
+                  </BehaviorKeyframe>
+                </BehaviorLayer>
+              </Timeline>
+              <Resource name="All motors" type="Lock" timeout="0" />
+            </Box>
+            <Box name="Move Toward" id="4" localization="8" tooltip="Make the robot move in the direction you set in parameters.&#x0A;&#x0A;!!Warning!! the robot will not stop moving by himself. You need to either set x, y and theta to 0 or stop the box to stop him.&#x0A;&#x0A;Note: You can set the period of move direction update in parameters." x="456" y="418">
+              <bitmap>media/images/box/movement/walk_forward.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[class MyClass(GeneratedClass):
+
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        import threading
+        self.motion = self.session().service("ALMotion")
+        self.x = 0
+        self.y = 0
+        self.theta = 0
+        self.ptask = qi.PeriodicTask()
+        self.lock = threading.RLock()
+
+    def onUnload(self):
+        with self.lock:
+            self.ptask.stop()
+            self.x = 0
+            self.y = 0
+            self.theta = 0
+            self.motion.moveToward(0, 0, 0)
+            self.motion.waitUntilMoveIsFinished()
+
+    def onInput_onStop(self):
+        with self.lock:
+            self.onUnload()
+            self.onStopped()
+
+    def onInput_onStart(self):
+        with self.lock:
+            period = self.getParameter("Period of direction update (s)")
+            us_period = int(period*1000000)
+
+            self.ptask.compensateCallbackTime(True)
+            self.ptask.setCallback(self.updateMovement)
+            self.ptask.setUsPeriod(us_period)
+            self.ptask.start(True)
+
+    def moveFailed(self):
+        self.onUnload()
+        self.onMoveFailed()
+
+    def updateMovement(self):
+        import math
+        with self.lock:
+            enableArms = self.getParameter("Arms movement enabled")
+            self.motion.setMoveArmsEnabled(enableArms, enableArms)
+            x = self.getParameter("X")
+            y = self.getParameter("Y")
+            theta = self.getParameter("Theta")
+            period = self.getParameter("Period of direction update (s)")
+            epsilon = 0.0001
+            dx = math.fabs(x - self.x)
+            dy = math.fabs(y - self.y)
+            dt = math.fabs(theta - self.theta)
+
+            # Update moveToward parameters
+            if(dx > epsilon or dy > epsilon or dt > epsilon):
+                self.x=x
+                self.y=y
+                self.theta=theta
+                self.motion.moveToward(self.x, self.y, self.theta)
+
+            # Check if the move has been canceled
+            if (not self.motion.moveIsActive()):
+                self.moveFailed()
+
+            us_period = int(period*1000000)
+            self.ptask.setUsPeriod(us_period)]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the box behavior is stopped." id="4" />
+              <Output name="onMoveFailed" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the motion move task is canceled." id="5" />
+              <Parameter name="X" inherits_from_parent="0" content_type="2" value="0.2" default_value="0.2" min="-1" max="1" tooltip="The distance in meters for forward/backward motion. Positive value&#x0A;means forward, negative value means backward." id="6" />
+              <Parameter name="Y" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="The distance in meters for lateral motion. Positive value means left, negative&#x0A;value means right." id="7" />
+              <Parameter name="Theta" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="The orientation in radians for final rotation. Positive value means anticlockwise,&#x0A;negative value means clockwise." id="8" />
+              <Parameter name="Period of direction update (s)" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.1" min="0" max="1" tooltip="" id="9" />
+              <Parameter name="Arms movement enabled" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Enables natural motion of the arms." id="10" />
+              <Resource name="Legs" type="Lock" timeout="0" />
+            </Box>
+            <Box name="Walk Toward" id="2" localization="8" tooltip="Make the robot walk in the direction you set in parameters.&#x0A;&#x0A;!!Warning!! the robot will not stop walking by himself. You need to either set x, y and theta to 0 or stop the box to stop him.&#x0A;&#x0A;Note: You can set the period of walk direction update in parameters." x="942" y="185">
+              <bitmap>media/images/box/movement/walk_forward.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        pass
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload()]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Parameter name="X" inherits_from_parent="0" content_type="2" value="0.5" default_value="0.5" min="-1" max="1" tooltip="Omnidirectional walk vector control for forward/backward motion. It corresponds&#x0A;to forward/backward step length. Two particular values:&#x0A;* 1.0 which is the maximum forward.&#x0A;* -1.0 which is the maximum backward." id="4" />
+              <Parameter name="Y" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="Omnidirectional walk vector control for lateral motion. It corresponds to lateral&#x0A;step length. Two particular values:&#x0A;* 1.0 which is the maximum on the left.&#x0A;* -1.0 which is the maximum on the right." id="5" />
+              <Parameter name="Theta" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="Omnidirectional walk vector control for rotation motion. It corresponds to&#x0A;rotational step length. Two particular values:&#x0A;* 1.0 which is the maximum for anticlockwise rotation.&#x0A;* -1.0 which is the maximum for clockwise rotation." id="6" />
+              <Parameter name="Step frequency" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="1" tooltip="Omnidirectional walk vector control for walking speed. Two particular values:&#x0A;* 0.0 which is the minimum speed.&#x0A;* 1.0 which is the maximum speed." id="7" />
+              <Parameter name="Left arm enabled" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Activate left arm motion during the walk to make it more realistic." id="8" />
+              <Parameter name="Right arm enabled" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Activate right arm motion during the walk to make it more realistic." id="9" />
+              <Parameter name="Stop walk when foot contact is lost" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="If this option is activated, the robot stops walking when he loses foot contact with&#x0A;the ground, and starts walking again when he recovers it. Else, he just keeps walking&#x0A;anyway." id="10" />
+              <Parameter name="Period of direction update (s)" inherits_from_parent="0" content_type="2" value="0.5" default_value="0.5" min="0.1" max="1" tooltip="The walk direction is regularly updated. This parameter sets how regularly it is." id="11" />
+              <Timeline enable="0">
+                <BehaviorLayer name="behavior_layer1">
+                  <BehaviorKeyframe name="keyframe1" index="1">
+                    <Diagram>
+                      <Box name="Give direction" id="1" localization="8" tooltip="Get the walk direction from parent box and return it in order to control the Update Direction&#x0A;box." x="151" y="38">
+                        <bitmap>media/images/box/sensors/inertial_unit.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        import threading
+        self.ptask = qi.PeriodicTask()
+        self.lock = threading.RLock()
+
+    def onUnload(self):
+        with self.lock:
+            self.ptask.stop()
+            self.outputX(0.0)
+            self.outputY(0.0)
+            self.outputTheta(0.0)
+
+    def onInput_onStart(self):
+        with self.lock:
+            period = self.getParameter("Period of direction update (s)")
+            us_period = int(period*1000000)
+            self.ptask.compensateCallbackTime(True)
+            self.ptask.setCallback(self.update)
+            self.ptask.setUsPeriod(us_period)
+            self.ptask.start(True)
+
+    def update(self):
+        with self.lock:
+            self.outputX(self.getParameter("X"))
+            self.outputY(self.getParameter("Y"))
+            self.outputTheta(self.getParameter("Theta"))
+            self.outputStepFrequency(self.getParameter("Step frequency"))
+
+            period = self.getParameter("Period of direction update (s)")
+            us_period = int(period*1000000)
+            self.ptask.setUsPeriod(us_period)
+
+    def onInput_onStop(self):
+        with self.lock:
+            self.onUnload()]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this Input." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this Input." id="3" />
+                        <Output name="outputX" type="2" type_size="1" nature="2" inner="0" tooltip="The new forward/backward motion value." id="4" />
+                        <Output name="outputY" type="2" type_size="1" nature="2" inner="0" tooltip="The new lateral motion value." id="5" />
+                        <Output name="outputTheta" type="2" type_size="1" nature="2" inner="0" tooltip="The new rotational motion value." id="6" />
+                        <Output name="outputStepFrequency" type="2" type_size="1" nature="2" inner="0" tooltip="The new walking speed value." id="7" />
+                        <Parameter name="Step frequency" inherits_from_parent="1" content_type="2" value="1" default_value="1" min="0" max="1" tooltip="" id="8" />
+                        <Parameter name="Theta" inherits_from_parent="1" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" />
+                        <Parameter name="Period of direction update (s)" inherits_from_parent="1" content_type="2" value="0.5" default_value="0.5" min="0.1" max="1" tooltip="" id="10" />
+                        <Parameter name="X" inherits_from_parent="1" content_type="2" value="0.5" default_value="0.5" min="-1" max="1" tooltip="" id="11" />
+                        <Parameter name="Y" inherits_from_parent="1" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="12" />
+                      </Box>
+                      <Box name="Update Direction" id="3" localization="8" tooltip="Update the walk direction.&#x0A;&#x0A;!!Warning!! the robot will not stop walking by himself. You need to either set x, y and theta to 0 or stop the box." x="355" y="28">
+                        <bitmap>media/images/box/movement/walk_forward.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.motion = self.session().service("ALMotion")
+        footGaitConfigMin = self.motion.getMoveConfig("Min")
+        footGaitConfigMax = self.motion.getMoveConfig("Max")
+        self.dFootGaitConfig = {}
+        for i in range(len(footGaitConfigMin)):
+            # [0] = key ("MaxStepX" for ex)
+            # [1] = min
+            # [2] = max
+            self.dFootGaitConfig[footGaitConfigMin[i][0]] = [footGaitConfigMin[i][1], footGaitConfigMax[i][1]]
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0
+        self.stepFrequency = 0.0
+        self.enableArms = []
+        self.enableFootContact = None
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.motion.stopMove()
+        self.bIsRunning = False
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+
+    def onInput_x(self, p):
+        self.bIsRunning = True
+        self.x = p
+        self.sendNewWalkTarget()
+
+    def onInput_y(self, p):
+        self.bIsRunning = True
+        self.y = p
+        self.sendNewWalkTarget()
+
+    def onInput_theta(self, p):
+        self.bIsRunning = True
+        self.theta = p
+        self.sendNewWalkTarget()
+
+    def onInput_stepFrequency(self, p):
+        self.stepFrequency = p
+        self.sendNewWalkTarget()
+
+    def initializeWalk(self):
+        enableArms = [self.getParameter("Left arm enabled"),
+                              self.getParameter("Right arm enabled")]
+        enableFootContact = self.getParameter("Stop walk when foot contact is lost")
+        for k, v in self.dFootGaitConfig.iteritems():
+            for unit in ["m", "rad", "%"]:
+                try: # try for each unit and do nothing if value in gaitConfig but not in parameters
+                    param = self.getParameter( str(k) + " (" + unit + ")" )
+                    if( unit == "%" ):
+                        param = param / 100.
+                    if( len(v) == 2 ):
+                        v.append( param )
+                    else:
+                        v[2] = param
+                    break
+                except:
+                    pass
+        if( self.enableArms != enableArms ):
+            self.enableArms = enableArms
+            self.motion.setMoveArmsEnabled( self.enableArms[0], self.enableArms[1] )
+        if( self.enableFootContact != enableFootContact ):
+            self.enableFootContact = enableFootContact
+            self.motion.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION",self.enableFootContact]])
+
+    def sendNewWalkTarget(self):
+        self.initializeWalk()
+        moveConfig = []
+        for k, v in self.dFootGaitConfig.iteritems():
+            try:
+                moveConfig.append( [k, v[2]] )
+            except: # if some value added in moveConfig but not in parameters
+                pass
+        moveConfig.append( ["Frequency", self.stepFrequency] )
+        self.motion.moveToward(self.x, self.y, self.theta, moveConfig)]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                        <Input name="x" type="2" type_size="1" nature="2" inner="0" tooltip="Omnidirectional walk vector control for forward/backward motion. It corresponds&#x0A;to forward/backward step length. Two particular values:&#x0A;* 1.0 which is the maximum forward.&#x0A;* -1.0 which is the maximum backward." id="2" />
+                        <Input name="y" type="2" type_size="1" nature="2" inner="0" tooltip="Omnidirectional walk vector control for lateral motion. It corresponds to lateral&#x0A;step length. Two particular values:&#x0A;* 1.0 which is the maximum on the left.&#x0A;* -1.0 which is the maximum on the right." id="3" />
+                        <Input name="theta" type="2" type_size="1" nature="2" inner="0" tooltip="Omnidirectional walk vector control for rotation motion. It corresponds to&#x0A;rotational step length. Two particular values:&#x0A;* 1.0 which is the maximum for anticlockwise rotation.&#x0A;* -1.0 which is the maximum for clockwise rotation." id="4" />
+                        <Input name="stepFrequency" type="2" type_size="1" nature="1" inner="0" tooltip="Omnidirectional walk vector control for walking speed. Two particular values:&#x0A;* 0.0 which is the minimum speed.&#x0A;* 1.0 which is the maximum speed." id="5" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="6" />
+                        <Parameter name="Left arm enabled" inherits_from_parent="1" content_type="0" value="1" default_value="1" tooltip="Activate left arm motion during the walk to make it more realistic." id="7" />
+                        <Parameter name="Right arm enabled" inherits_from_parent="1" content_type="0" value="1" default_value="1" tooltip="Activate right arm motion during the walk to make it more realistic." id="8" />
+                        <Parameter name="Stop walk when foot contact is lost" inherits_from_parent="1" content_type="0" value="1" default_value="1" tooltip="If this option is activated, the robot stops walking when he loses foot contact with&#x0A;the ground, and starts walking again when he recovers it. Else, he just keeps walking&#x0A;anyway." id="9" />
+                        <Parameter name="MaxStepX (m)" inherits_from_parent="0" content_type="2" value="0.04" default_value="0.04" min="0.001" max="0.06" tooltip='Maximum length of forward/backward step.&#x0A;&#x0A;Note: The actual step length is the value of the maximum length &quot;MaxStepX&quot;&#x0A;multiplied by the value of the ratio parameter &quot;X&quot;:&#x0A;ActualX (m) = MaxStepX (m) * X' id="10" />
+                        <Parameter name="MaxStepY (m)" inherits_from_parent="0" content_type="2" value="0.14" default_value="0.14" min="0.101" max="0.16" tooltip='Maximum length of lateral step.&#x0A;&#x0A;Note: The actual step length is the value of the maximum length &quot;MaxStepY&quot;&#x0A;multiplied by the value of the ratio parameter &quot;Y&quot;:&#x0A;ActualY (m) = MaxStepY (m) * Y' id="11" />
+                        <Parameter name="MaxStepTheta (rad)" inherits_from_parent="0" content_type="2" value="0.349065" default_value="0.349065" min="0.001" max="0.523598" tooltip='Maximum length of rotational step.&#x0A;&#x0A;Note: The actual step length is the value of the maximum length &quot;MaxStepTheta&quot;&#x0A;multiplied by the value of the ratio parameter &quot;Theta&quot;:&#x0A;ActualTheta (rad) = MaxStepTheta (rad) * Theta' id="12" />
+                        <Parameter name="MaxStepFrequency (%)" inherits_from_parent="0" content_type="1" value="100" default_value="100" min="0" max="100" tooltip='Maximum step frequency.&#x0A;&#x0A;Note: The actual step frequency is the value of the maximum step frequency&#x0A;&quot;MaxStepFrequency&quot; multiplied by the value of the ratio parameter &quot;StepFrequency&quot;:&#x0A;ActualStepFrequency = MaxStepFrequency (%) / 100 * StepFrequency' id="13" />
+                        <Parameter name="StepHeight (m)" inherits_from_parent="0" content_type="2" value="0.02" default_value="0.02" min="0.005" max="0.04" tooltip="Height of the step i.e. how high the robot put his feet up during the walk." id="14" />
+                        <Parameter name="TorsoWx (rad)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-0.122173" max="0.122173" tooltip="Lateral angle of the torso during the walk.&#x0A;&#x0A;Note: A positive value means that the robot will be tilted to the right. A negative&#x0A;value means he is tilted to the left." id="15" />
+                        <Parameter name="TorsoWy (rad)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-0.122173" max="0.122173" tooltip="Angle of the torso toward forward/backward during the walk.&#x0A;&#x0A;Note: A positive value means that the robot will be inclined forward. A negative&#x0A;value means he is inclined backward." id="16" />
+                      </Box>
+                      <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
+                      <Link inputowner="3" indexofinput="2" outputowner="1" indexofoutput="4" />
+                      <Link inputowner="3" indexofinput="3" outputowner="1" indexofoutput="5" />
+                      <Link inputowner="3" indexofinput="4" outputowner="1" indexofoutput="6" />
+                      <Link inputowner="3" indexofinput="5" outputowner="1" indexofoutput="7" />
+                    </Diagram>
+                  </BehaviorKeyframe>
+                </BehaviorLayer>
+              </Timeline>
+              <Resource name="Legs" type="Lock" timeout="0" />
+            </Box>
+            <Box name="Hands" id="5" localization="8" tooltip="the robot stiffens the motors of one or both of his hands so that he can open or close&#x0A;it/them. Then he relaxes the motors of his hand(s)." x="395" y="592">
+              <bitmap>media/images/box/movement/move_arm.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.motion = self.session().service( "ALMotion" )
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onStart(self):
+        if( self.bIsRunning ):
+            return
+        self.bIsRunning = True
+        try:
+            hands = []
+            if( self.getParameter("Side") in ["Left", "Both"] ):
+                hands.append( "LHand" )
+            if( self.getParameter("Side") in ["Right", "Both"] ):
+                hands.append( "RHand" )
+            motionOps = []
+            for hand in hands:
+                if( self.getParameter("Action") == "Open the hand" ):
+                    motionOps.append( self.motion.openHand(hand, _async=True) )
+                else:
+                    motionOps.append( self.motion.closeHand(hand, _async=True) )
+            for motionOp in motionOps:
+                motionOp.wait()
+        finally:
+            self.bIsRunning = False
+            self.onDone() # activate output of the box]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+              <Parameter name="Side" inherits_from_parent="0" content_type="3" value="Both" default_value="Both" custom_choice="0" tooltip="Choose the hand to move or both of them." id="4">
+                <Choice value="Both" />
+                <Choice value="Left" />
+                <Choice value="Right" />
+              </Parameter>
+              <Parameter name="Action" inherits_from_parent="0" content_type="3" value="Open the hand" default_value="Open the hand" custom_choice="0" tooltip="Action you want to make on the robot&apos;s hand." id="5">
+                <Choice value="Open the hand" />
+                <Choice value="Close the hand" />
+              </Parameter>
+            </Box>
+            <Box name="Tai Chi Chuan" id="6" localization="8" tooltip="Arms part of Tai Chi Chuan dance." x="634" y="225">
+              <bitmap>media/images/box/movement/dance.png</bitmap>
+              <script language="4">
+                <content>
+                  <![CDATA[]]>
+                </content>
+              </script>
+              <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+              <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+              <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+              <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+              <Timeline enable="1" fps="5" start_frame="1" end_frame="-1" size="250">
+                <BehaviorLayer name="LED">
+                  <BehaviorKeyframe name="keyframe15" index="15">
+                    <Diagram>
+                      <Box name="Light_ConcentratedEyes" id="1" localization="8" tooltip="Set an animated gaze which expresses concentration." x="231" y="105">
+                        <bitmap>media/images/box/interaction/LED.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+  def __init__(self):
+    try: # disable autoBind;
+      GeneratedClass.__init__(self, False);
+    except TypeError: # if NAOqi < 1.14;
+      GeneratedClass.__init__( self );
+
+  def onLoad(self):
+    self.bIsRunning = False;
+    self.leds = self.session().service("ALLeds")
+
+  def onUnload(self):
+    self.onInput_onStop(); # will stop current loop execution
+
+  def onInput_onStart(self):
+    #self.log( self.getName() + ": start - begin" );
+
+    if( self.bIsRunning ):
+      #print( self.getName() + ": already started => nothing" );
+      return;
+
+    self.bIsRunning = True;
+    self.bMustStop = False;
+
+    rDuration = 1.0;
+    self.leds.fadeRGB( "FaceLedsTop", 0x0000ff, rDuration, _async=True );
+    self.leds.fadeRGB( "FaceLedsInternal", 0x00ff00, rDuration, _async=True );
+    self.leds.fadeRGB( "FaceLedsBottom", 0x0000ff, rDuration, _async=True );
+    self.leds.fadeRGB( "FaceLedsExternal", 0x0000ff, rDuration );
+
+    while( not self.bMustStop ):
+      rTime=1.0
+      self.leds.fadeRGB( "FaceLedsInternal", 0x000000, rTime );
+      if( self.bMustStop ):
+        break;
+      self.leds.fadeRGB( "FaceLedsInternal", 0x00ff00, rDuration );
+
+
+    # end while
+    self.bIsRunning = False;
+    self.onStopped();
+
+  def onInput_onStop(self):
+    self.bMustStop = True; # will stop current loop execution]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                      </Box>
+                      <Box name="Tocolor" id="2" localization="8" tooltip="tags:&#x0A;LED" x="490" y="183">
+                        <bitmap>media/images/box/interaction/LED.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #~ puts code for box initialization here
+        self.leds = self.session().service("ALLeds")
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        self.leds.reset("EarLeds")
+        pass
+
+    def onInput_onStart(self):
+        rDuration = 0.2
+        self.leds.fadeRGB( "BrainLeds", 0xffffff, rDuration)
+
+        self.onStopped()
+
+    def onInput_onStop(self):
+        self.onUnload() #~ it is usually a good idea to call onUnload of this box in a onStop method, as the code written in onUnload is used to finish the working of the box as well
+        pass]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        <Resource name="Left eye leds" type="Lock" timeout="1" />
+                        <Resource name="Right eye leds" type="Lock" timeout="1" />
+                      </Box>
+                      <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="1" />
+                    </Diagram>
+                  </BehaviorKeyframe>
+                  <BehaviorKeyframe name="Eye48" index="247">
+                    <Diagram>
+                      <Box name="Blink" id="3" localization="8" tooltip="tags:&#x0A;LED" x="339" y="161">
+                        <bitmap>media/images/box/interaction/LED.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #~ puts code for box initialization here
+        self.leds = self.session().service("ALLeds")
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self):
+        rDuration = 0.05;
+        self.leds.fadeRGB( "FaceLed0", 0x000000, rDuration, _async=True );
+        self.leds.fadeRGB( "FaceLed1", 0x000000, rDuration, _async=True );
+        self.leds.fadeRGB( "FaceLed2", 0xffffff, rDuration, _async=True  );
+        self.leds.fadeRGB( "FaceLed3", 0x000000, rDuration, _async=True  );
+        self.leds.fadeRGB( "FaceLed4", 0x000000, rDuration, _async=True  );
+        self.leds.fadeRGB( "FaceLed5", 0x000000, rDuration, _async=True  );
+        self.leds.fadeRGB( "FaceLed6", 0xffffff, rDuration, _async=True  );
+        self.leds.fadeRGB( "FaceLed7", 0x000000, rDuration );
+
+        time.sleep( 0.1 );
+
+        rDuration = 0.05;
+        self.leds.fadeRGB( "FaceLeds", 0xffffff, rDuration );
+
+        self.onStopped()
+
+
+    def onInput_onStop(self):
+        self.onUnload() #~ it is usually a good idea to call onUnload of this box in a onStop method, as the code written in onUnload is used to finish the working of the box as well
+        pass]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        <Resource name="Left eye leds" type="Lock" timeout="1" />
+                        <Resource name="Right eye leds" type="Lock" timeout="1" />
+                      </Box>
+                      <Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="1" />
+                    </Diagram>
+                  </BehaviorKeyframe>
+                </BehaviorLayer>
+                <BehaviorLayer name="music">
+                  <BehaviorKeyframe name="keyframe12" index="12">
+                    <Diagram>
+                      <Box name="Play Sound" id="1" localization="8" tooltip="Play a sound file. Select the file in parameters. The format of the file can be wav or ogg (on virtual robot) and also mp3 (on a real robot).&#x0A;&#x0A;Note: There can be some delay to play ogg or mp3 (on a robot) files. We advise you to use wav if&#x0A;you want a fast play of the file." x="193" y="90">
+                        <bitmap>media/images/box/interaction/play_music.png</bitmap>
+                        <script language="4">
+                          <content>
+                            <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onStart(self):
+        self.bIsRunning = True
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped()]]>
+                          </content>
+                        </script>
+                        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Starts the music." id="2" />
+                        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stops the music." id="3" />
+                        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished or stopped." id="4" />
+                        <Parameter name="File name" inherits_from_parent="0" content_type="4" value="/sounds/mikhael-landscape-paisaje.ogg" default_value="" tooltip="Name of the file you want to play.&#x0A;&#x0A;Note: You can click on the folder icon to browse the project content or import&#x0A;new files to the project." id="5" />
+                        <Parameter name="Begin position (s)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="0" max="600" tooltip="Position in seconds where the playing must start." id="6" />
+                        <Parameter name="Volume (%)" inherits_from_parent="0" content_type="1" value="100" default_value="100" min="0" max="100" tooltip="Volume the file is played with." id="7" />
+                        <Parameter name="Balance L/R" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="Value which determines if the sound is played more on the robot&apos;s left or right.&#x0A;You can particularly set it to:&#x0A;- -1 to play only on the left loudspeaker.&#x0A;- 0 to play on both loudspeakers.&#x0A;- 1 to play only on the right loudspeaker." id="8" />
+                        <Parameter name="Play in loop" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="This parameter allows to play the file in loop. The playing will start each time at&#x0A;the beginning of the file." id="9" />
+                        <Timeline enable="0">
+                          <BehaviorLayer name="behavior_layer1">
+                            <BehaviorKeyframe name="keyframe1" index="1">
+                              <Diagram>
+                                <Box name="Play Sound File" id="2" localization="8" tooltip="Play the sound." x="442" y="70">
+                                  <bitmap>media/images/box/interaction/play_music.png</bitmap>
+                                  <script language="4">
+                                    <content>
+                                      <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.player = self.session().service('ALAudioPlayer')
+        self.playerStop = self.session().service('ALAudioPlayer') #Create another service as wait is blocking if audioout is remote
+        self.bIsRunning = False
+        self.ids = []
+
+    def onUnload(self):
+        for id in self.ids:
+            try:
+                self.playerStop.stop(id)
+            except:
+                pass
+        while( self.bIsRunning ):
+            time.sleep( 0.2 )
+
+    def onInput_onStart(self, p):
+        self.bIsRunning = True
+        try:
+            if (self.getParameter("Play in loop")) :
+               id = self.player.pCall("playFileInLoop",p,self.getParameter("Volume (%)")/100.,self.getParameter("Balance L/R"))
+            else :
+               id = self.player.pCall("playFileFromPosition",p,self.getParameter("Begin position (s)"),self.getParameter("Volume (%)")/100.,self.getParameter("Balance L/R"))
+            self.ids.append(id)
+            self.player.wait(id)
+        finally:
+            try:
+                self.ids.remove(id)
+            except:
+                pass
+            if( self.ids == [] ):
+                self.onStopped() # activate output of the box
+                self.bIsRunning = False
+
+    def onInput_onStop(self):
+        self.onUnload()]]>
+                                    </content>
+                                  </script>
+                                  <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" />
+                                  <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this Input." id="2" />
+                                  <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this Input." id="3" />
+                                  <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when Box behavior is finished." id="4" />
+                                  <Parameter name="Begin position (s)" inherits_from_parent="1" content_type="2" value="0" default_value="0" min="0" max="600" tooltip="Position in seconds where the playing must start." id="5" />
+                                  <Parameter name="Volume (%)" inherits_from_parent="1" content_type="1" value="100" default_value="100" min="0" max="100" tooltip="Volume the file is played with." id="6" />
+                                  <Parameter name="Balance L/R" inherits_from_parent="1" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="Value which determines if the sound is played more on the robot&apos;s left or right.&#x0A;You can particularly set it to:&#x0A;- -1 to play only on the left loudspeaker.&#x0A;- 0 to play on both loudspeakers.&#x0A;- 1 to play only on the right loudspeaker." id="7" />
+                                  <Parameter name="Play in loop" inherits_from_parent="1" content_type="0" value="0" default_value="0" tooltip="This parameter allows to play the file in loop. The playing will start each time at&#x0A;the beginning of the file." id="8" />
+                                </Box>
+                                <Box name="Get Attached File" id="1" localization="8" tooltip="Use this box to choose an attached file in its parameters. The filename will be sent on&#x0A;the output when the input is stimulated." x="216" y="71">
+                                  <bitmap>media/images/box/folder.png</bitmap>
+                                  <script language="4">
+                                    <content>
+                                      <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        pass
+
+    def onInput_onStart(self):
+        self.onStopped(self.behaviorAbsolutePath() + self.getParameter("File name"))]]>
+                                    </content>
+                                  </script>
+                                  <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                  <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the filepath on the output." id="2" />
+                                  <Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The filepath of the selected resource file." id="3" />
+                                  <Parameter name="File name" inherits_from_parent="1" content_type="4" value="" default_value="" tooltip="Name of the file which is going to be sent on the box output.&#x0A;&#x0A;Note: You can click on the folder icon to browse the project content or import&#x0A;new files to the project." id="4" />
+                                </Box>
+                                <Link inputowner="0" indexofinput="4" outputowner="2" indexofoutput="4" />
+                                <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                <Link inputowner="2" indexofinput="2" outputowner="1" indexofoutput="3" />
+                              </Diagram>
+                            </BehaviorKeyframe>
+                          </BehaviorLayer>
+                        </Timeline>
+                        <Resource name="Audio player" type="Lock" timeout="0" />
+                      </Box>
+                      <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="1" />
+                    </Diagram>
+                  </BehaviorKeyframe>
+                </BehaviorLayer>
+                <ActuatorList model="nao">
+                  <ActuatorCurve name="value" actuator="HeadYaw" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="4.82967e-06" />
+                    <Key frame="35" value="4.82968e-06" />
+                    <Key frame="45" value="4.82968e-06" />
+                    <Key frame="55" value="-2.73208e-05" />
+                    <Key frame="65" value="18" />
+                    <Key frame="75" value="-17" />
+                    <Key frame="85" value="-68" />
+                    <Key frame="95" value="-16" />
+                    <Key frame="105" value="12" />
+                    <Key frame="118" value="90" />
+                    <Key frame="131" value="12" />
+                    <Key frame="142" value="8" />
+                    <Key frame="152" value="0" />
+                    <Key frame="162" value="-8" />
+                    <Key frame="172" value="16" />
+                    <Key frame="185" value="-12" />
+                    <Key frame="198" value="-90" />
+                    <Key frame="211" value="-12" />
+                    <Key frame="222" value="-8" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="0" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="5.12931e-06" />
+                    <Key frame="35" value="-2.73208e-05" />
+                    <Key frame="45" value="5.0962e-06" />
+                    <Key frame="55" value="6.01466e-06" />
+                    <Key frame="65" value="19" />
+                    <Key frame="75" value="18" />
+                    <Key frame="85" value="5.26559e-06" />
+                    <Key frame="95" value="-19" />
+                    <Key frame="105" value="8" />
+                    <Key frame="118" value="-5" />
+                    <Key frame="131" value="8" />
+                    <Key frame="142" value="22" />
+                    <Key frame="152" value="32" />
+                    <Key frame="162" value="22" />
+                    <Key frame="172" value="-19" />
+                    <Key frame="185" value="8" />
+                    <Key frame="198" value="-5" />
+                    <Key frame="211" value="8" />
+                    <Key frame="222" value="22" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="-10.0411" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0">
+                    <Key frame="15" value="90" />
+                    <Key frame="25" value="110" />
+                    <Key frame="35" value="120" />
+                    <Key frame="45" value="90" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="21" />
+                    <Key frame="75" value="20" />
+                    <Key frame="85" value="11" />
+                    <Key frame="95" value="-46" />
+                    <Key frame="105" value="-10" />
+                    <Key frame="118" value="-17" />
+                    <Key frame="131" value="-10" />
+                    <Key frame="142" value="30" />
+                    <Key frame="152" value="27" />
+                    <Key frame="162" value="19" />
+                    <Key frame="172" value="-27" />
+                    <Key frame="185" value="4" />
+                    <Key frame="198" value="-4" />
+                    <Key frame="211" value="4" />
+                    <Key frame="222" value="19" />
+                    <Key frame="231" value="97" />
+                    <Key frame="250" value="83.0164" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0">
+                    <Key frame="15" value="10" />
+                    <Key frame="25" value="20" />
+                    <Key frame="35" value="10" />
+                    <Key frame="45" value="10" />
+                    <Key frame="55" value="10" />
+                    <Key frame="65" value="40" />
+                    <Key frame="75" value="0" />
+                    <Key frame="85" value="5" />
+                    <Key frame="95" value="10" />
+                    <Key frame="105" value="23" />
+                    <Key frame="118" value="66" />
+                    <Key frame="131" value="23" />
+                    <Key frame="142" value="23" />
+                    <Key frame="152" value="10" />
+                    <Key frame="162" value="0" />
+                    <Key frame="172" value="23" />
+                    <Key frame="185" value="0" />
+                    <Key frame="198" value="0" />
+                    <Key frame="211" value="0" />
+                    <Key frame="222" value="12" />
+                    <Key frame="231" value="54" />
+                    <Key frame="250" value="12.7723" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0">
+                    <Key frame="15" value="-90" />
+                    <Key frame="25" value="-90" />
+                    <Key frame="35" value="-90" />
+                    <Key frame="45" value="-90" />
+                    <Key frame="55" value="-90" />
+                    <Key frame="65" value="-22" />
+                    <Key frame="75" value="0" />
+                    <Key frame="85" value="0" />
+                    <Key frame="95" value="0" />
+                    <Key frame="105" value="0" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="0" />
+                    <Key frame="142" value="0" />
+                    <Key frame="152" value="12" />
+                    <Key frame="162" value="11" />
+                    <Key frame="172" value="-24" />
+                    <Key frame="185" value="-24" />
+                    <Key frame="198" value="-5" />
+                    <Key frame="211" value="-24" />
+                    <Key frame="222" value="11" />
+                    <Key frame="227" value="-21.7" />
+                    <Key frame="231" value="-14" />
+                    <Key frame="250" value="-68.8135" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="-40" />
+                    <Key frame="35" value="-60" />
+                    <Key frame="45" value="0" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="-95" />
+                    <Key frame="75" value="-55" />
+                    <Key frame="85" value="-85" />
+                    <Key frame="95" value="-58" />
+                    <Key frame="105" value="-58" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="-58" />
+                    <Key frame="142" value="-58" />
+                    <Key frame="152" value="-51" />
+                    <Key frame="162" value="-49" />
+                    <Key frame="172" value="-64" />
+                    <Key frame="185" value="-49" />
+                    <Key frame="198" value="-72" />
+                    <Key frame="211" value="-49" />
+                    <Key frame="222" value="-49" />
+                    <Key frame="227" value="-57" />
+                    <Key frame="231" value="-81.4" />
+                    <Key frame="250" value="-23.6757" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0">
+                    <Key frame="15" value="-88" />
+                    <Key frame="250" value="5.78932" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LHand" mute="0" unit="1">
+                    <Key frame="15" value="0" />
+                    <Key frame="250" value="0.291787" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0">
+                    <Key frame="15" value="90" />
+                    <Key frame="25" value="110" />
+                    <Key frame="35" value="120" />
+                    <Key frame="45" value="90" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="10" />
+                    <Key frame="75" value="35" />
+                    <Key frame="85" value="60" />
+                    <Key frame="95" value="-27" />
+                    <Key frame="105" value="4" />
+                    <Key frame="118" value="-4" />
+                    <Key frame="131" value="4" />
+                    <Key frame="142" value="19" />
+                    <Key frame="152" value="27" />
+                    <Key frame="162" value="30" />
+                    <Key frame="172" value="-46" />
+                    <Key frame="185" value="-10" />
+                    <Key frame="198" value="-17" />
+                    <Key frame="211" value="-10" />
+                    <Key frame="222" value="30" />
+                    <Key frame="231" value="97" />
+                    <Key frame="250" value="82.7438" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0">
+                    <Key frame="15" value="-10" />
+                    <Key frame="25" value="-10" />
+                    <Key frame="35" value="-20" />
+                    <Key frame="45" value="-10" />
+                    <Key frame="55" value="-9.99896" />
+                    <Key frame="65" value="-4" />
+                    <Key frame="75" value="-48" />
+                    <Key frame="85" value="-87" />
+                    <Key frame="95" value="-23" />
+                    <Key frame="105" value="0" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="0" />
+                    <Key frame="142" value="0" />
+                    <Key frame="152" value="-10" />
+                    <Key frame="162" value="-23" />
+                    <Key frame="172" value="-10" />
+                    <Key frame="185" value="-23" />
+                    <Key frame="198" value="-66" />
+                    <Key frame="211" value="-23" />
+                    <Key frame="222" value="-32" />
+                    <Key frame="231" value="-54" />
+                    <Key frame="250" value="-12.6315" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0">
+                    <Key frame="15" value="90" />
+                    <Key frame="25" value="90" />
+                    <Key frame="35" value="90" />
+                    <Key frame="45" value="90" />
+                    <Key frame="55" value="90" />
+                    <Key frame="65" value="11" />
+                    <Key frame="75" value="20" />
+                    <Key frame="85" value="90" />
+                    <Key frame="95" value="24" />
+                    <Key frame="105" value="24" />
+                    <Key frame="118" value="5" />
+                    <Key frame="131" value="24" />
+                    <Key frame="142" value="-11" />
+                    <Key frame="152" value="-12" />
+                    <Key frame="162" value="0" />
+                    <Key frame="172" value="0" />
+                    <Key frame="185" value="0" />
+                    <Key frame="198" value="0" />
+                    <Key frame="211" value="0" />
+                    <Key frame="222" value="0" />
+                    <Key frame="227" value="19.6" />
+                    <Key frame="231" value="14" />
+                    <Key frame="250" value="68.8565" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="40" />
+                    <Key frame="35" value="60" />
+                    <Key frame="45" value="1.47493e-05" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="71" />
+                    <Key frame="75" value="94" />
+                    <Key frame="85" value="4" />
+                    <Key frame="95" value="64" />
+                    <Key frame="105" value="49" />
+                    <Key frame="118" value="72" />
+                    <Key frame="131" value="49" />
+                    <Key frame="142" value="49" />
+                    <Key frame="152" value="51" />
+                    <Key frame="162" value="58" />
+                    <Key frame="172" value="58" />
+                    <Key frame="185" value="58" />
+                    <Key frame="198" value="2" />
+                    <Key frame="211" value="58" />
+                    <Key frame="222" value="58" />
+                    <Key frame="227" value="64.9" />
+                    <Key frame="231" value="78.3" />
+                    <Key frame="250" value="23.387" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0">
+                    <Key frame="15" value="88" />
+                    <Key frame="250" value="6.23278" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RHand" mute="0" unit="1">
+                    <Key frame="15" value="0" />
+                    <Key frame="250" value="0.301984" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LHipYawPitch" mute="0" unit="0">
+                    <Key frame="15" value="-6.2" />
+                    <Key frame="25" value="-6.9" />
+                    <Key frame="35" value="-6.94104" />
+                    <Key frame="45" value="-7.04938" />
+                    <Key frame="55" value="-8.2" />
+                    <Key frame="65" value="-9.6" />
+                    <Key frame="75" value="-5.7" />
+                    <Key frame="85" value="0" />
+                    <Key frame="95" value="0" />
+                    <Key frame="105" value="0" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="0" />
+                    <Key frame="142" value="-0.566539" />
+                    <Key frame="152" value="0" />
+                    <Key frame="162" value="0" />
+                    <Key frame="172" value="0" />
+                    <Key frame="185" value="0" />
+                    <Key frame="198" value="0" />
+                    <Key frame="211" value="0" />
+                    <Key frame="222" value="-3.9" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="-9.74084" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LHipRoll" mute="0" unit="0">
+                    <Key frame="15" value="-3" />
+                    <Key frame="25" value="-7" />
+                    <Key frame="35" value="-11.4235" />
+                    <Key frame="45" value="5.96288" />
+                    <Key frame="55" value="6" />
+                    <Key frame="65" value="-10" />
+                    <Key frame="75" value="10" />
+                    <Key frame="85" value="24.1" />
+                    <Key frame="95" value="30.3" />
+                    <Key frame="105" value="28.7" />
+                    <Key frame="118" value="32.4" />
+                    <Key frame="131" value="28.7" />
+                    <Key frame="142" value="19.9829" />
+                    <Key frame="152" value="0" />
+                    <Key frame="162" value="-15" />
+                    <Key frame="167" value="14.4" />
+                    <Key frame="172" value="15" />
+                    <Key frame="185" value="8" />
+                    <Key frame="198" value="40" />
+                    <Key frame="211" value="8" />
+                    <Key frame="222" value="-15" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="6.82441" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LHipPitch" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="0" />
+                    <Key frame="35" value="-19.8395" />
+                    <Key frame="45" value="-0.0382666" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="-40" />
+                    <Key frame="75" value="-35" />
+                    <Key frame="85" value="-60" />
+                    <Key frame="95" value="-60" />
+                    <Key frame="105" value="-60" />
+                    <Key frame="118" value="-60" />
+                    <Key frame="131" value="-60" />
+                    <Key frame="142" value="-59.6787" />
+                    <Key frame="152" value="-50" />
+                    <Key frame="162" value="-42.5" />
+                    <Key frame="172" value="-7" />
+                    <Key frame="185" value="-50" />
+                    <Key frame="198" value="0" />
+                    <Key frame="211" value="-50" />
+                    <Key frame="222" value="-37.5" />
+                    <Key frame="231" value="-60" />
+                    <Key frame="250" value="7.30057" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LKneePitch" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="0" />
+                    <Key frame="35" value="42.8009" />
+                    <Key frame="45" value="0.0951225" />
+                    <Key frame="55" value="-5.69182e-06" />
+                    <Key frame="65" value="80" />
+                    <Key frame="75" value="70" />
+                    <Key frame="85" value="120" />
+                    <Key frame="95" value="120" />
+                    <Key frame="105" value="120" />
+                    <Key frame="118" value="120" />
+                    <Key frame="131" value="120" />
+                    <Key frame="142" value="120.887" />
+                    <Key frame="152" value="100" />
+                    <Key frame="162" value="85" />
+                    <Key frame="172" value="7" />
+                    <Key frame="185" value="100" />
+                    <Key frame="198" value="0" />
+                    <Key frame="211" value="100" />
+                    <Key frame="222" value="75" />
+                    <Key frame="231" value="120" />
+                    <Key frame="250" value="-5.09006" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LAnklePitch" mute="0" unit="0">
+                    <Key frame="15" value="5.75265e-06" />
+                    <Key frame="25" value="0" />
+                    <Key frame="35" value="-22.1511" />
+                    <Key frame="45" value="-0.569877" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="-37.1" />
+                    <Key frame="75" value="-35" />
+                    <Key frame="85" value="-60" />
+                    <Key frame="95" value="-60" />
+                    <Key frame="105" value="-60" />
+                    <Key frame="118" value="-60" />
+                    <Key frame="131" value="-60" />
+                    <Key frame="142" value="-59.6787" />
+                    <Key frame="152" value="-50" />
+                    <Key frame="162" value="-42.5" />
+                    <Key frame="172" value="0" />
+                    <Key frame="185" value="5.75265e-06" />
+                    <Key frame="198" value="30" />
+                    <Key frame="211" value="5.75265e-06" />
+                    <Key frame="217" value="-31.8" />
+                    <Key frame="222" value="-37.5" />
+                    <Key frame="231" value="-60" />
+                    <Key frame="250" value="5.00876" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="LAnkleRoll" mute="0" unit="0">
+                    <Key frame="15" value="3" />
+                    <Key frame="25" value="7" />
+                    <Key frame="35" value="9.83048" />
+                    <Key frame="45" value="-6.94104" />
+                    <Key frame="55" value="-6" />
+                    <Key frame="65" value="10" />
+                    <Key frame="75" value="-15" />
+                    <Key frame="85" value="3.6" />
+                    <Key frame="95" value="4.2" />
+                    <Key frame="105" value="0.5" />
+                    <Key frame="118" value="1.8" />
+                    <Key frame="131" value="0.5" />
+                    <Key frame="142" value="6.97225" />
+                    <Key frame="152" value="0" />
+                    <Key frame="162" value="-13.8" />
+                    <Key frame="167" value="-31.9" />
+                    <Key frame="172" value="-24.3" />
+                    <Key frame="185" value="-20" />
+                    <Key frame="198" value="0" />
+                    <Key frame="211" value="-20" />
+                    <Key frame="222" value="-17.9" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="-6.34798" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RHipRoll" mute="0" unit="0">
+                    <Key frame="15" value="3" />
+                    <Key frame="25" value="-7" />
+                    <Key frame="35" value="-24.8982" />
+                    <Key frame="45" value="-6.04821" />
+                    <Key frame="55" value="-6" />
+                    <Key frame="65" value="-20" />
+                    <Key frame="75" value="-45" />
+                    <Key frame="85" value="-31" />
+                    <Key frame="95" value="-12.7" />
+                    <Key frame="105" value="-25.6" />
+                    <Key frame="118" value="-40" />
+                    <Key frame="131" value="-25.6" />
+                    <Key frame="142" value="15.2077" />
+                    <Key frame="152" value="0" />
+                    <Key frame="162" value="-20" />
+                    <Key frame="172" value="-30.9" />
+                    <Key frame="185" value="-29.3" />
+                    <Key frame="198" value="-34.2" />
+                    <Key frame="211" value="-35" />
+                    <Key frame="222" value="-30.5" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="-6.82407" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RHipPitch" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="0" />
+                    <Key frame="35" value="0.134711" />
+                    <Key frame="45" value="0.21464" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="-40" />
+                    <Key frame="75" value="-10" />
+                    <Key frame="85" value="-6" />
+                    <Key frame="95" value="-7" />
+                    <Key frame="105" value="-50" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="-50" />
+                    <Key frame="142" value="-45.3545" />
+                    <Key frame="152" value="-50" />
+                    <Key frame="162" value="-60" />
+                    <Key frame="172" value="-60" />
+                    <Key frame="185" value="-60" />
+                    <Key frame="198" value="-60" />
+                    <Key frame="211" value="-60" />
+                    <Key frame="222" value="-60" />
+                    <Key frame="231" value="-60" />
+                    <Key frame="250" value="7.30058" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RKneePitch" mute="0" unit="0">
+                    <Key frame="15" value="0" />
+                    <Key frame="25" value="0" />
+                    <Key frame="35" value="0.178188" />
+                    <Key frame="45" value="-0.410883" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="80" />
+                    <Key frame="75" value="20" />
+                    <Key frame="85" value="7" />
+                    <Key frame="95" value="7" />
+                    <Key frame="105" value="100" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="100" />
+                    <Key frame="142" value="90.0035" />
+                    <Key frame="152" value="100" />
+                    <Key frame="162" value="120" />
+                    <Key frame="172" value="120" />
+                    <Key frame="185" value="120" />
+                    <Key frame="198" value="120" />
+                    <Key frame="211" value="120" />
+                    <Key frame="222" value="120" />
+                    <Key frame="231" value="120" />
+                    <Key frame="250" value="-5.26102" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RAnklePitch" mute="0" unit="0">
+                    <Key frame="15" value="5.75266e-06" />
+                    <Key frame="25" value="0" />
+                    <Key frame="35" value="0.266079" />
+                    <Key frame="45" value="-0.349163" />
+                    <Key frame="55" value="0" />
+                    <Key frame="65" value="-40" />
+                    <Key frame="75" value="-10" />
+                    <Key frame="85" value="0" />
+                    <Key frame="95" value="0" />
+                    <Key frame="105" value="5.75266e-06" />
+                    <Key frame="118" value="30" />
+                    <Key frame="131" value="5.75266e-06" />
+                    <Key frame="142" value="-45.8771" />
+                    <Key frame="152" value="-50" />
+                    <Key frame="162" value="-60" />
+                    <Key frame="172" value="-60" />
+                    <Key frame="185" value="-60" />
+                    <Key frame="198" value="-60" />
+                    <Key frame="211" value="-60" />
+                    <Key frame="222" value="-60" />
+                    <Key frame="231" value="-60" />
+                    <Key frame="250" value="5.00876" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="value" actuator="RAnkleRoll" mute="0" unit="0">
+                    <Key frame="15" value="-3" />
+                    <Key frame="25" value="7.5" />
+                    <Key frame="35" value="22.6325" />
+                    <Key frame="45" value="6.68218" />
+                    <Key frame="55" value="6" />
+                    <Key frame="65" value="16.9" />
+                    <Key frame="75" value="35.6" />
+                    <Key frame="85" value="45" />
+                    <Key frame="95" value="42.6" />
+                    <Key frame="105" value="25" />
+                    <Key frame="118" value="0" />
+                    <Key frame="131" value="25" />
+                    <Key frame="142" value="9.83317" />
+                    <Key frame="152" value="0" />
+                    <Key frame="162" value="-10" />
+                    <Key frame="172" value="-2.41531" />
+                    <Key frame="185" value="-3.18747" />
+                    <Key frame="198" value="-0.718272" />
+                    <Key frame="211" value="-0.558977" />
+                    <Key frame="222" value="-1.55043" />
+                    <Key frame="231" value="0" />
+                    <Key frame="250" value="6.34774" />
+                  </ActuatorCurve>
+                  <ActuatorCurve name="RHipYawPitch (RHipYawPitch)" actuator="RHipYawPitch" mute="0" unit="0">
+                    <Key frame="15" value="-6.2" />
+                    <Key frame="25" value="-6.9" />
+                    <Key frame="35" value="-7.55628" />
+                    <Key frame="45" value="-7.04938" />
+                    <Key frame="55" value="-8.2" />
+                    <Key frame="65" value="-9.6" />
+                    <Key frame="142" value="0.178188" />
+                    <Key frame="250" value="-9.74084" />
+                  </ActuatorCurve>
+                </ActuatorList>
+              </Timeline>
+              <Resource name="Standing" type="Lock" timeout="1" />
+              <Resource name="All motors" type="Lock" timeout="1" />
+            </Box>
+            <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="4" />
+            <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
+            <Link inputowner="3" indexofinput="2" outputowner="6" indexofoutput="4" />
+          </Diagram>
+        </BehaviorKeyframe>
+      </BehaviorLayer>
+    </Timeline>
+  </Box>
+</ChoregrapheProject>
